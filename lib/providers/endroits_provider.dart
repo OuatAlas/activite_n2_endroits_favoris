@@ -1,18 +1,13 @@
-// ═══════════════════════════════════════════════════════════════════
-// 2. lib/providers/endroits_provider.dart
-// ═══════════════════════════════════════════════════════════════════
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../modele/endroit.dart';
 
-// Riverpod v2 : Notifier remplace StateNotifier
 class EndroitsNotifier extends Notifier<List<Endroit>> {
-
-  // build() remplace le constructeur — définit l'état initial
   @override
-  List<Endroit> build() => [];
+  List<Endroit> build() {
+    return [];
+  }
 
-  // Ajouter un endroit en tête de liste
   void ajouterEndroit({
     required String nom,
     required File image,
@@ -30,13 +25,10 @@ class EndroitsNotifier extends Notifier<List<Endroit>> {
     state = [nouvelEndroit, ...state];
   }
 
-  // Supprimer un endroit par son id
   void supprimerEndroit(String id) {
-    state = state.where((e) => e.id != id).toList();
+    state = state.where((endroit) => endroit.id != id).toList();
   }
 }
 
-// Riverpod v2 : NotifierProvider remplace StateNotifierProvider
-final endroitsProvider = NotifierProvider<EndroitsNotifier, List<Endroit>>(
-  EndroitsNotifier.new,
-);
+final endroitsProvider =
+    NotifierProvider<EndroitsNotifier, List<Endroit>>(EndroitsNotifier.new);

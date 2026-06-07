@@ -1,65 +1,73 @@
-// ═══════════════════════════════════════════════════════════════════
-// 5. lib/widgets/endroits_list.dart
-// ═══════════════════════════════════════════════════════════════════
 import 'package:flutter/material.dart';
 import '../modele/endroit.dart';
 import '../vue/endroit_detail.dart';
 
 class EndroitsList extends StatelessWidget {
-  const EndroitsList({super.key, required this.endroits});
-
   final List<Endroit> endroits;
+
+  const EndroitsList({super.key, required this.endroits});
 
   @override
   Widget build(BuildContext context) {
-    // Liste vide
     if (endroits.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.place_outlined, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            Icon(
+              Icons.location_off_outlined,
+              size: 60,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            ),
+            const SizedBox(height: 16),
             Text(
               'Aucun endroit favori pour le moment.',
-              style: TextStyle(color: Colors.grey),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6),
+                  ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               'Appuyez sur + pour en ajouter un.',
-              style: TextStyle(color: Colors.grey, fontSize: 12),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.4),
+                  ),
             ),
           ],
         ),
       );
     }
 
-    // Liste des endroits
     return ListView.builder(
       itemCount: endroits.length,
-      itemBuilder: (context, index) {
+      itemBuilder: (ctx, index) {
         final endroit = endroits[index];
         return ListTile(
-          // Vignette de la photo
           leading: CircleAvatar(
-            backgroundImage: FileImage(endroit.image),
             radius: 26,
+            backgroundImage: FileImage(endroit.image),
           ),
-          title: Text(endroit.nom),
-          // Adresse si disponible
+          title: Text(
+            endroit.nom,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
           subtitle: endroit.adresse != null
               ? Text(
                   endroit.adresse!,
-                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 )
               : null,
           trailing: const Icon(Icons.chevron_right),
-          // Navigation vers la page de détails
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (_) => EndroitDetail(endroit: endroit),
+                builder: (ctx) => EndroitDetail(endroit: endroit),
               ),
             );
           },

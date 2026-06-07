@@ -1,6 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
-// 6. lib/vue/ajout_endroit.dart
-// ═══════════════════════════════════════════════════════════════════
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,7 +5,6 @@ import '../providers/endroits_provider.dart';
 import '../widgets/image_prise.dart';
 import '../widgets/localisation_prise.dart';
 
-// ConsumerStatefulWidget : état local + accès aux providers Riverpod
 class AjoutEndroit extends ConsumerStatefulWidget {
   const AjoutEndroit({super.key});
 
@@ -18,26 +14,26 @@ class AjoutEndroit extends ConsumerStatefulWidget {
 
 class _AjoutEndroitState extends ConsumerState<AjoutEndroit> {
   final _nomController = TextEditingController();
+
   File? _imageSelectionnee;
+
   double? _latitude;
   double? _longitude;
   String? _adresse;
 
   @override
   void dispose() {
-    // Libérer le controller pour éviter les fuites mémoire
     _nomController.dispose();
     super.dispose();
   }
 
-  // Callback reçu depuis ImagePrise
   void _surPhotoSelectionnee(File image) {
-    setState(() => _imageSelectionnee = image);
+    setState(() {
+      _imageSelectionnee = image;
+    });
   }
 
-  // Callback reçu depuis LocalisationPrise
-  void _surLocalisationSelectionnee(
-      double lat, double lng, String adresse) {
+  void _surLocalisationSelectionnee(double lat, double lng, String adresse) {
     setState(() {
       _latitude = lat;
       _longitude = lng;
@@ -45,25 +41,18 @@ class _AjoutEndroitState extends ConsumerState<AjoutEndroit> {
     });
   }
 
-  // Validation et enregistrement de l'endroit
   void _enregistrerEndroit() {
     final nom = _nomController.text.trim();
 
-    if (nom.isEmpty) {
+    if (nom.isEmpty || _imageSelectionnee == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez saisir un nom.')),
+        const SnackBar(
+          content: Text('Veuillez entrer un nom et prendre une photo.'),
+        ),
       );
       return;
     }
 
-    if (_imageSelectionnee == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez prendre une photo.')),
-      );
-      return;
-    }
-
-    // Riverpod v2 : ref.read + .notifier pour appeler une méthode
     ref.read(endroitsProvider.notifier).ajouterEndroit(
           nom: nom,
           image: _imageSelectionnee!,
@@ -72,55 +61,54 @@ class _AjoutEndroitState extends ConsumerState<AjoutEndroit> {
           adresse: _adresse,
         );
 
-    // Fermer la page
     Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Ajout d'un nouvel endroit")),
+      appBar: AppBar(
+        title: const Text('Ajout d\'un nouvel endroit'),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Champ nom
             TextField(
               controller: _nomController,
               decoration: const InputDecoration(
-                labelText: "Nom de l'endroit",
+                labelText: 'Nom de l\'endroit',
                 border: OutlineInputBorder(),
               ),
-              textCapitalization: TextCapitalization.sentences,
+              textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: 16),
 
-            // Widget prise de photo
             const Text(
               'Photo',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
             ImagePrise(onPhotoSelectionnee: _surPhotoSelectionnee),
             const SizedBox(height: 16),
 
-            // Widget localisation GPS
             const Text(
               'Localisation',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 8),
             LocalisationPrise(
-              onLocalisationSelectionnee: _surLocalisationSelectionnee,
-            ),
+                onLocalisationSelectionnee: _surLocalisationSelectionnee),
             const SizedBox(height: 24),
 
-            // Bouton enregistrer
             ElevatedButton.icon(
               onPressed: _enregistrerEndroit,
               icon: const Icon(Icons.save),
-              label: const Text("Enregistrer l'endroit"),
+              label: const Text('Enregistrer l\'endroit'),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
             ),
           ],
         ),
